@@ -10,6 +10,7 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.21.0" />
     <PackageReference Include="Azure.Identity" Version="1.12.0" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.12.54" />
   </ItemGroup>
 
 </Project>

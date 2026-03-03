@@ -63,8 +63,9 @@ public static class DocumentEndpointsExtensions
                 return Results.StatusCode(500);
             }
         })
-        .WithName("UploadDocuments");
-
+        .WithName("UploadDocuments")
+        .DisableAntiforgery();
+    
         endpoints.MapGet("/api/documents/{documentId}", async (
             string documentId,
             IBlobStorageVault vault,
