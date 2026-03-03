@@ -1,0 +1,18 @@
+# Created by https://www.toptal.com/developers/gitignore/api/dotnetcore
+# Edit at https://www.toptal.com/developers/gitignore?templates=dotnetcore
+
+### DotnetCore ###
+# .NET Core build folders
+bin/
+obj/
+
+# Common node modules locations
+/node_modules
+/wwwroot/node_modules
+
+# End of https://www.toptal.com/developers/gitignore/api/dotnetcore
+.github/prompts/document-uploader-api.prompt.md
+.vscode/settings.json
+SETUP_SUMMARY.md
+__azurite_db_blob__.json
+__azurite_db_blob_extent__.json
