@@ -64,7 +64,8 @@ public static class DocumentEndpointsExtensions
             }
         })
         .WithName("UploadDocuments")
-        .DisableAntiforgery();
+        .DisableAntiforgery()
+        .RequireAuthorization();
     
         endpoints.MapGet("/api/documents/{documentId}", async (
             string documentId,
@@ -92,7 +93,8 @@ public static class DocumentEndpointsExtensions
                 return Results.StatusCode(500);
             }
         })
-        .WithName("GetDocument");
+        .WithName("GetDocument")
+        .RequireAuthorization();
 
         endpoints.MapDelete("/api/documents/{documentId}", async (
             string documentId,
@@ -125,7 +127,8 @@ public static class DocumentEndpointsExtensions
                 return Results.StatusCode(500);
             }
         })
-        .WithName("DeleteDocument");
+        .WithName("DeleteDocument")
+        .RequireAuthorization();
 
         endpoints.MapGet("/api/documents", async (
             IBlobStorageVault vault,
@@ -150,6 +153,40 @@ public static class DocumentEndpointsExtensions
             }
         })
         .WithName("ListDocuments");
+        // .RequireAuthorization();
+
+        // Diagnostic endpoint to check blob storage connection
+        endpoints.MapGet("/api/documents/debug", async (
+            IBlobStorageVault vault,
+            ILogger<Program> logger) =>
+        {
+            try
+            {
+                logger.LogInformation("Debug: Attempting to list documents");
+                var documents = await vault.ListDocumentsAsync(CancellationToken.None);
+                logger.LogInformation("Debug: Found {Count} documents", documents.Count());
+                
+                return Results.Ok(new
+                {
+                    Success = true,
+                    Count = documents.Count(),
+                    Documents = documents,
+                    Message = "Debug listing successful"
+                });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Debug: Error listing documents");
+                return Results.Ok(new
+                {
+                    Success = false,
+                    Error = ex.Message,
+                    StackTrace = ex.StackTrace,
+                    InnerException = ex.InnerException?.Message
+                });
+            }
+        })
+        .WithName("DebugListDocuments");
 
         endpoints.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
             .WithName("HealthCheck");

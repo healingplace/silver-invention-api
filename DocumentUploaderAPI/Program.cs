@@ -6,6 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddOpenApi();
 builder.Services.AddLogging();
+
+// Add Auth0 authentication
+builder.Services.AddAuth0Authentication(builder.Configuration);
+
 builder.Services.AddCors();
 
 await builder.AddDocumentStorageAsync();
@@ -37,6 +41,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add authentication and authorization middleware
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Configure CORS for frontend apps
 app.UseCors(x => x
