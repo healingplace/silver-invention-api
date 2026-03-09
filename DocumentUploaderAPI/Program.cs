@@ -10,7 +10,10 @@ builder.Services.AddLogging();
 // Add Auth0 authentication
 builder.Services.AddAuth0Authentication(builder.Configuration);
 
-builder.Services.AddCors();
+// builder.Services.AddCors();
+
+// Add CORS with configurable origins
+builder.Services.AddDocumentUploaderCors(builder.Configuration);
 
 await builder.AddDocumentStorageAsync();
 
@@ -40,17 +43,22 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-app.UseHttpsRedirection();
+// Only use HTTPS redirection when HTTPS is configured
+if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("UseHttpsRedirection", false))
+{
+    app.UseHttpsRedirection();
+}
 
 // Add authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 
 // Configure CORS for frontend apps
-app.UseCors(x => x
-    .AllowAnyOrigin()
-    .AllowAnyMethod()
-    .AllowAnyHeader());
+// app.UseCors(x => x
+//     .AllowAnyOrigin()
+//     .AllowAnyMethod()
+//     .AllowAnyHeader());
+app.UseCors("AllowFrontend");
 
 app.MapDocumentEndpoints();
 

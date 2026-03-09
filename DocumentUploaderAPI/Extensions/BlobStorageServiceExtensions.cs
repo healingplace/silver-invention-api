@@ -16,7 +16,9 @@ public static class BlobStorageServiceExtensions
 
         if (useEmulator)
         {
-            var blobServiceClient = new BlobServiceClient("UseDevelopmentStorage=true");
+            // Support custom connection string for containerized Azurite
+            var connectionString = blobConfig["ConnectionString"] ?? "UseDevelopmentStorage=true";
+            var blobServiceClient = new BlobServiceClient(connectionString);
             containerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
             try

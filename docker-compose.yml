@@ -1,0 +1,80 @@
+services:
+  # Document Uploader API (.NET)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: document-uploader-api
+    ports:
+      - "5190:8080"  # HTTP - maps container 8080 to localhost 5190
+      - "7190:8443"  # HTTPS - maps container 8443 to localhost 7190
+    environment:
+      # Auth0 Configuration
+      Auth0__Domain: ${AUTH0_DOMAIN:-https://your-tenant.auth0.com}
+      Auth0__Audience: ${AUTH0_AUDIENCE:-https://documentuploader-api}
+      
+      # Azure Blob Storage Configuration (uncomment for production)
+      # AzureBlob__UseEmulator: "false"
+      # AzureBlob__StorageAccountUri: ${AZURE_STORAGE_URI:-https://your-account.blob.core.windows.net}
+      # AzureBlob__ContainerName: documents
+      
+      # Development - use Azurite emulator
+      AzureBlob__UseEmulator: "true"
+      AzureBlob__ConnectionString: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
+      AzureBlob__ContainerName: documents
+      
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      
+      # Logging
+      Logging__LogLevel__Default: Information
+      Logging__LogLevel__Microsoft.AspNetCore: Warning
+    
+    networks:
+      - app-network
+    
+    depends_on:
+      - azurite
+    
+    # For development with azurite
+    volumes:
+      - azurite-data:/data
+
+  # Azure Storage Emulator (Azurite)
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: azurite-emulator
+    ports:
+      - "10000:10000"  # Blob storage
+      - "10001:10001"  # Queue storage
+      - "10002:10002"  # Table storage
+    volumes:
+      - azurite-data:/data
+    networks:
+      - app-network
+    command: azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck --loose --blobPort 10000
+
+  # React App (uncomment and adjust if needed)
+  # frontend:
+  #   build:
+  #     context: ../path-to-react-app
+  #     dockerfile: Dockerfile
+  #   container_name: document-uploader-frontend
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     REACT_APP_API_URL: http://api:8080
+  #     REACT_APP_AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+  #     REACT_APP_AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
+  #   networks:
+  #     - app-network
+  #   depends_on:
+  #     - api
+
+volumes:
+  azurite-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

@@ -18,3 +18,4 @@ __azurite_db_blob__.json
 __azurite_db_blob_extent__.json
 /__blobstorage__
 DocumentUploaderAPI/appsettings.Development.json
+DocumentUploaderAPI/appsettings.Production.json
